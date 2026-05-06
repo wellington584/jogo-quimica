@@ -116,6 +116,7 @@
       border-radius: 6px;
       cursor: grab;
       user-select: none;
+      touch-action: manipulation;
     }
 
     .metal:active { cursor: grabbing; }
@@ -316,7 +317,7 @@
           </div>
         </div>
         <div class="vf-box">
-          (3) A desoximioglobina apresenta número de coordenação 5; após a coordenação do oxigênio (O2), o composto agora é denominado oximioglobina com cor vermelha e é pentacoordenado.<br>
+          (3) A desoximioglobina apresenta número de coordenação 5; após a coordenação do oxigênio (O<sub>2</sub>), o composto agora é denominado oximioglobina com cor vermelha e é pentacoordenado.<br>
           <div class="vf-options">
             <label class="vf-option"><input type="radio" name="q2_3" value="V"><span>V</span></label>
             <label class="vf-option"><input type="radio" name="q2_3" value="F"><span>F</span></label>
@@ -397,9 +398,7 @@
       ev.dataTransfer.setData("text", ev.target.id);
     }
 
-    function drop(ev) {
-      ev.preventDefault();
-      const data = ev.dataTransfer.getData("text");
+    function aplicarMetal(data) {
       const dropZona = document.getElementById("dropZona");
       const f = document.getElementById("f1");
       const nextBtn = document.getElementById("next1");
@@ -422,6 +421,12 @@
         f.innerText = "Errado! Mg forma clorofila. Tente novamente.";
         nextBtn.style.display = "none";
       }
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      const data = ev.dataTransfer.getData("text");
+      aplicarMetal(data);
     }
 
     function mostrarPergunta(atual, proxima) {
@@ -603,6 +608,16 @@
 
       document.querySelectorAll(".metal").forEach(function(metal) {
         metal.addEventListener("dragstart", drag);
+
+        // No celular, arrastar pode falhar. Então também permite tocar no Mg ou Fe.
+        metal.addEventListener("click", function(){
+          aplicarMetal(metal.id);
+        });
+
+        metal.addEventListener("touchstart", function(ev){
+          ev.preventDefault();
+          aplicarMetal(metal.id);
+        }, { passive: false });
       });
 
       const dropZona = document.getElementById("dropZona");
@@ -641,6 +656,7 @@
       console.assert(typeof enviarQ6 === "function", "enviarQ6 deve existir.");
       console.assert(typeof verificarCodigo === "function", "verificarCodigo deve existir.");
       console.assert(typeof drop === "function", "drop deve existir.");
+      console.assert(typeof aplicarMetal === "function", "aplicarMetal deve existir para celular.");
       console.assert(typeof abrirZoom === "function", "abrirZoom deve existir.");
       console.assert(typeof tocarMusica === "function", "tocarMusica deve existir.");
       console.assert(document.getElementById("bgAudio") !== null, "Áudio de fundo deve existir.");
@@ -655,6 +671,7 @@
       console.assert(document.getElementById("codigoFinal") !== null, "Campo do código final deve existir.");
       console.assert(document.getElementById("voltarCapaBtn") !== null, "Botão voltar para capa deve existir.");
     }
+
     window.addEventListener("DOMContentLoaded", function() {
       configurarEventos();
       testarJogo();
